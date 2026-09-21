@@ -1,0 +1,32 @@
+Initialize the I2C communication
+Initialize with the Multiplexer (TCA9548A)
+Initialize microcontroller (FireBeetle ESP32)
+Initialize magnetic encoders (AS5600)
+    -base
+    -shoulder
+    -elbow
+    -wristYaw
+    -wristPitch
+    -wristRoll
+Initialize slide potentiometer
+
+Set channels for the econders on the Multiplexer
+Set analog input pin for the potentiometer
+
+Main Loop forever:
+    For each joint (base, shoulder, elbow, wristYaw, wristPitch, wristRoll):
+        Select Multiplexer channel for the joint
+        Read the encoder angle
+        Store the angle in an array of joint angles
+
+    Read the potentiometer value for gripper
+    Map the value to the gripper positions
+
+    Display the joint angles and gripper value telemetry 
+
+    Send joint angle and potentiometer values to the rover arm via CAN
+
+    Wait some refresh rate amount of time
+
+End Loop
+
