@@ -1,34 +1,6 @@
 // Libraries
-#if __has_include(<Arduino.h>)
-#include <Arduino.h>
-#else
-// Fallback declarations allow editor parsing when the Arduino SDK is not
-// configured; an Arduino build will use the real header above.
-class SerialPort {
-public:
-    void begin(unsigned long);
-    void print(const char*);
-};
-extern SerialPort Serial;
-#endif
-
-#if __has_include(<Wire.h>)
-#include <Wire.h>
-#else
-class I2CBus {
-public:
-    void begin();
-};
-extern I2CBus Wire;
-#endif
-
-void initMultiplexer();
-void initEncoders();
-void initGripper();
-void initCAN();
-
-// Number of joints on the robot
-constexpr int NUM_JOINTS = 6;
+// Number of joints on the roobot
+#define NUM_JOINTS 6
 
 // Joint angle storage
 float jointAngles[NUM_JOINTS];
@@ -54,5 +26,33 @@ void setup() {
 }
 
 void loop() {
+    for (int joint = 0; joint < NUM_JOINTS; joint++) {
+        // Select the multiplexer channel for the current joint
+        selectMultiplexerChannel(joint);
+        
+        // Read the angle from the encoder
+        jointAngles[joint] = readEncoderAngle();
+    }
+
+    // Read the gripper position
+    float rawGripperPosition = readGripperPosition();
+    float gripperPosition = mapGripperPosition(rawGripperPosition);
+
+    // Telemetry output
+    for (int joint = 0; joint < NUM_JOINTS; joint++) {
+        Serial.print("Joint ");
+        Serial.print(joint);
+        Serial.print(": ");
+        Serial.print(jointAngles[joint]);
+        Serial.println(" degrees");
+    }
+    serial.print("Gripper Position: ");
+    Serial.println(gripperPosition);
+
+    sendCAN(jointAngles, gripperPosition);
+
+    delay(100); // Delay
+
+
     
 }
